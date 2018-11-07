@@ -58,7 +58,7 @@ while [ "$1" != "" ]; do
 						echo "Usage: $(basename $0) [OPTIONS]..."
 						echo "Map and count unique reads using bowtie2, samtools and bedtools."
 						echo ""
-						echo "Available parameters:"
+						echo "PARAMETERS"
 						echo "	-1, --first	first mate pair sequences in fastq format"
 						echo "	-2, --second	second mate pair sequences in fastq format"
 						echo "	-c, --cores	number of cores to use, defaults to 1"
@@ -72,10 +72,10 @@ while [ "$1" != "" ]; do
 						echo ""
 						echo "EXAMPLE USAGE"
 						echo "	$(basename $0) -g sacCer3 -U 'singleReadFile1.fastq.gz,singleReadFile2.fastq.gz' -s sampleName -w 1000 -c 8 -m 500M"
-						echo "	(single end reads, multiple files, BOWTIE2_INDEXES specified)"
+						echo "		(single end reads, multiple files, BOWTIE2_INDEXES specified)"
 						echo ""
-						echo "$(basename $0) -g /path/to/bowtie2_index/sacCer3 -1 firstMateFile.fastq.gz -2 secondMateFile.fastq.gz -s sampleName -w 1000 -c 8 -m 500M"
-						echo "	(paired-end reads, multiple files, BOWTIE2_INDEXES specified):"
+						echo "	$(basename $0) -g /path/to/bowtie2_index/sacCer3 -1 firstMateFile.fastq.gz -2 secondMateFile.fastq.gz -s sampleName -w 1000 -c 8 -m 500M"
+						echo "		(paired-end reads, BOWTIE2_INDEXES not specified):"
 						exit 1
 									;;
 
