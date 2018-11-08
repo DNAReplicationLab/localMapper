@@ -18,9 +18,9 @@ scriptVersion="1.0"
 #~				$ sudo apt-get install bowtie2 samtools bedtools picard-tools
 #~			if successful, you don't need to worry about the variables below.
 #~	2) - painful: the programs are downloaded manually and cannot be run by typing $ bowtie2 (or similar) into the command line. You must use one of the options below:
-#~		A) installation folders are added manually to your search path (again, mind $BOWTIE2_INDEXES);
+#~		A) add installation folders manually to your search path (again, mind $BOWTIE2_INDEXES);
 #~			see https://askubuntu.com/questions/60218/how-to-add-a-directory-to-the-path
-#~		B) the variables are specified in this script (see below).
+#~		B) specify the variables in this script (see below).
 #~		C) variables $BOWTIE2, $BOWTIE2_INDEXES, $SAMTOOLS, $BEDTOOLS, $PICARDTOOLS are specified elsewhere (e.g your ~/.profile file)
 #~			see https://help.ubuntu.com/community/EnvironmentVariables
 
@@ -202,7 +202,9 @@ command10="rm -r ${tmp}"
 
 # write the bash file
 echo "#!/bin/bash" > $theBASHfile
-echo "#$(basename $0 .sh) version: $scriptVersion" >> $theBASHfile
+echo "#Created with $(basename $0 .sh) version: $scriptVersion" >> $theBASHfile
+echo "#Authors: Dzmitry Batrakou, Conrad Nieduszynski" >> $theBASHfile
+echo 'INITIME=`date +%s`' >> $theBASHfile
 echo $command1 >> $theBASHfile
 if [ "$testMode" != TRUE ] ; then
 	echo $command2 >> $theBASHfile
@@ -219,6 +221,7 @@ echo $command9 >> $theBASHfile
 if [ "$testMode" != TRUE ] ; then
 	echo $command10 >> $theBASHfile
 fi
+echo "echo \"$sampleName analysis time: \$(((\$(date +%s)-\$INITIME)/60)) minutes\"	>&2" >> $theBASHfile
 # execute the bash file
 if [ "$testMode" != TRUE ] ; then
 	/bin/bash $theBASHfile 2> ${sampleDir}/${sampleName}_$(basename $0 .sh)_errors.txt

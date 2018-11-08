@@ -1,0 +1,5 @@
+# localMapper
+shell script to map Illuminia paired-end or single reads to reference, sort resulting bam file, mark duplicates (for paired-end), index the bam file, extract number of reads mapped in bins (5', first in pair for paired end).
+If run without testing mode (-t), it will create sample folder with subfolders 'processed', 'raw' and 'tmp'. After execution, 'raw' folder will contain the provied fastq files with read-only flags (if possible), the 'processed' folder will contain the counted reads in genomic bins (bed file format) - this is what is needed for further analysis. The 'tmp' folder will be deleted to free up disk space.
+If run in testing mode, the script will create sample directory and all subdirectories as above, write the bash script into the sample directory but will not execute it. When executed manually (copy the script into the directory above), the raw files will not be moved and temporary directory 'tmp' will not be deleted.
+Use -h flag (or --help) to output help.
