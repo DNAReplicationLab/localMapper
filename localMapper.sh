@@ -196,7 +196,7 @@ if [ -n "$matePAIR" ]; then
 	command8="$SAMTOOLS view -h -@ $theNUMBERofCORES -q 30 -F 3840 -L ${tmp}/${genomeName}.${theWINDOWsize}bp.bed ${processed}/${sampleName}.bam | grep -v XS:i: | $SAMTOOLS view -@ $theNUMBERofCORES -b - | $BEDTOOLS genomecov -5 -d -ibam stdin | awk 'BEGIN {OFS=\"\\t\"} {if (\$3>0) print \$1,\$2,\$2,\"name\",\$3}' > ${tmp}/${sampleName}.bed"
 fi
 # this sums reads for the control sample within the specified windows (e.g. 1000 bp) and uses awk to convert to bed format
-command9="$BEDTOOLS map -a ${tmp}/${genomeName}.${theWINDOWsize}bp.bed -b ${tmp}/${sampleName}.bed -null 0 -o sum | awk 'BEGIN {OFS=\"\\t\"} {if (\$4>0) print \$1,\$2,\$3,\"name\",\$4}' > ${processed}/${sampleName}.bed"
+command9="$BEDTOOLS map -a ${tmp}/${genomeName}.${theWINDOWsize}bp.bed -b ${tmp}/${sampleName}.bed -null 0 -o sum | awk 'BEGIN {OFS=\"\\t\"} {if (\$4>0) print \$1,\$2,\$3,\"${sampleName}\",\$4}' > ${processed}/${sampleName}.bed"
 # clean up
 command10="rm -r ${tmp}"
 
