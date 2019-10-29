@@ -1,0 +1,61 @@
+bowtie2 -p 16 -X 750 -q --phred33 -x /path/to/indexed/genome -1 /path/to/reads_1.fastq.gz -2 /path/to/reads_2.fastq.gz -S /path/where/to/save.sam
+
+# this is command for mapping raw reads to a genome. The genome must be indexed with bowtie2_build
+# -p:		number of threads (up to the total threads on the machine running the bowtie2)
+# -X:		the maximum fragment length for valid paired-end alignments (fragmentation-specific)
+# -q:		reads are FASTQ files
+# --phred33:	input qualities are ASCII chars equal to the Phred quality plus 33 (modern Illumina score)
+# -x:		basename of the index for the reference genome (specified at the end of bowtie2-build command)
+# -1:		file(s) containing mate 1s ("file1,file2" if multiple)
+# -2:		files containing mate 2s
+# -S:		output alignment as a sam file
+
+
+samtools sort -l 9 -@ 15 -m 512M  -O bam -o sorted.bam -T tmp/folder input.sam
+
+# -l:		compression level, 9 is most compressed
+# -@:	number of additional threads to use
+# -m:		maximum allocated RAM per thread
+# -O:		output file format
+# -o:		output file name
+# -T:		directory for temporary files
+
+
+java -XX:ParallelGCThreads=7 -jar /path/to/picard.jar MarkDuplicates I=file.bam O=deduplicated.file.bam M=metrics.txt TMP_DIR=/tmp/directory
+
+#  this command marks optical duplicates (from PCR amplification) using picardtools. Needs paired end sequences
+# -XX:ParallelGCThreads:	number of additional threads to use
+# -I:			input bam file
+# -O:			output bam file
+# -M:			name for the description file
+# -TMP_DIR:		directory for temporary files
+
+
+samtools index sorted.file.bam
+
+#  this command indexes sorted the bam file
+
+
+samtools  idxstats indexed.bam | awk 'BEGIN {OFS="\t"} {if ($2>0) print ($1,$2)}' > genome.txt
+
+#  this command extracts chromosome names and their sizes from the bam file and saves them as a text file
+
+
+bedtools makewindows -g genome.txt -w 1000 > windows.bed
+
+#  this command makes a bed file with bins of specified size
+
+
+samtools view -h -@ 8 -q 30 -F 3840 -f 64 -L windows.bed indexed.bam | grep -v XS:i: | samtools view -@ 8 -b - | bedtools genomecov -5 -d -ibam stdin | awk 'BEGIN {OFS="\t"} {if ($3>0) print $1,$2,$2,"name",$3}' > coverage.bed
+
+#  this command makes a bed file with read counts (5’, one read per paired sequence) for every nucleotide of the genome
+
+
+bedtools map -a windows.bed -b coverage.bed -null 0 -o sum | awk 'BEGIN {OFS="\t"} {if ($4>0) print $1,$2,$3,"name",$4}' > reads_per_bin.bed
+
+#  this command sums up reads per nucleotide into bin sums
+
+
+bedtools  intersect -a non_replicating.bed -b replicating.bed -wb | awk 'BEGIN {OFS="\t"} {line[NR] = $0; control+=$5; repl+=$10; count+=1} END { for (r=1; r<=NR; ++r) {split(line[r], fields); if(fields[5]>0.25*control/count && fields[10]>0.25*repl/count) print fields[1],fields[2],fields[3],fields[4],(fields[10]/fields[5])}}' > ratio.bed
+
+#  this command makes a ratio bed file, where number of reads from replicating sample is divided by number of reads from non-replicating sample in every bin, adjusted by the number of total reads
